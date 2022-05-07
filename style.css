@@ -1,0 +1,78 @@
+body {
+  background-color: white;
+  font-family: "Courier New", Courier, monospace;
+  text-align: center;
+  font-family: "Courier New", Courier, monospace;
+}
+h1 {
+  color: rgb(103, 179, 103);
+  font-weight: 900;
+  margin-top: 5px;
+}
+.inst {
+  font-size: large;
+  color: rgb(4, 37, 4);
+  font-weight: 900;
+}
+.moves {
+  font-size: large;
+  color: rgb(1, 29, 1);
+  font-weight: 900;
+}
+.images {
+  width: 60%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -4%);
+}
+.hiddden {
+  display: none;
+}
+
+img {
+  width: 50%;
+  height: 122px;
+}
+.hidden {
+  visibility: hidden;
+}
+.showing {
+  visibility: visible;
+}
+.match {
+  visibility: visible;
+}
+.imgDiv {
+  background-color: green;
+  display: inline-block;
+  height: auto;
+  width: 20%;
+  margin: 3px;
+}
+button {
+  background-color: rgb(15, 255, 15);
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  color: black;
+  font-size: 1.5rem;
+}
+
+@media screen and (max-width: 600px) {
+  .images {
+    width: 100%;
+  }
+  img {
+    width: 40%;
+    height: 100px;
+  }
+}
+@media screen and (max-width: 992px) {
+  .images {
+    width: 80%;
+  }
+}
