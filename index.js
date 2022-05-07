@@ -4,152 +4,138 @@ const startGameBtn = document.querySelector(".startGameBtn");
 const script = document.querySelector(".script");
 const inst = document.querySelector(".inst");
 
-let suffelldArray;
-const imagesArray = [
-  "img/cat.png",
-  "img/cat.png",
-  "img/elephant.png",
-  "img/elephant.png",
-  "img/dog.png",
-  "img/dog.png",
-  "img/croc.png",
-  "img/croc.png",
-  "img/horse.png",
-  "img/horse.png",
-  "img/lion.png",
-  "img/lion.png",
-  "img/rat.png",
-  "img/rat.png",
-  "img/panda.png",
-  "img/panda.png",
-];
+class App {
+  #sound = new Audio("audio/audio.mp3");
 
-let sound = new Audio("audio/audio.mp3");
-let matchSound = new Audio("audio/match.wav");
+  #matchSound = new Audio("audio/match.wav");
 
-const suffleImages = function (array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 0));
-    let temp = array[i];
-    array[i] = array[j];
-    array[j] = temp;
+  #movesCounter = 0;
+
+  #showingArray = [];
+
+  #suffelldArray;
+
+  #currImg;
+
+  #i;
+
+  #imagesArray = [
+    "img/cat.png",
+    "img/cat.png",
+    "img/elephant.png",
+    "img/elephant.png",
+    "img/dog.png",
+    "img/dog.png",
+    "img/croc.png",
+    "img/croc.png",
+    "img/horse.png",
+    "img/horse.png",
+    "img/lion.png",
+    "img/lion.png",
+    "img/rat.png",
+    "img/rat.png",
+    "img/panda.png",
+    "img/panda.png",
+  ];
+  constructor() {
+    this._start();
+
+    images.addEventListener("click", this._playGame.bind(this));
+
+    startGameBtn.addEventListener("click", this._resetGame.bind(this));
   }
-  suffelldArray = array;
-};
+  _start() {
+    const imagesCopy = [...this.#imagesArray];
+    this._suffleImages(imagesCopy);
+    imagesCopy.forEach((i) => {
+      console.log(i);
+      const html = `
+      <div class="imgDiv"><img src="${i}" alt="" class="hidden"></div>
+      `;
+      images.insertAdjacentHTML("beforeend", html);
+    });
+  }
+  _suffleImages(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * i);
+      let temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
+    this.#suffelldArray = array;
+  }
+  _playGame(e) {
+    // play sound
+    this.#sound.play();
+    // clear instructions
+    this._clearInst();
+    // Assign current image
+    this.#currImg = e.target.firstElementChild;
 
-const start = function () {
-  const imagesCopy = [...imagesArray];
-  suffleImages(imagesCopy);
-  imagesCopy.forEach((i) => {
-    console.log(i);
-    const html = `
-    <div class="imgDiv"><img src="${i}" alt="" class="hidden"></div>
-    `;
-    images.insertAdjacentHTML("beforeend", html);
-  });
-};
-start();
-startGameBtn.addEventListener("click", function (e) {
-  e.preventDefault();
-  window.location.reload();
-});
-
-let movesCounter = 0;
-let showingArray = [];
-images.addEventListener("click", function (e) {
-  sound.play();
-  startGameBtn.classList.remove("hiddden");
-  inst.classList.add("hiddden");
-  movesCounter++;
-  moves.textContent = `moves: ${movesCounter}`;
-  const currImg = e.target.firstElementChild;
-  currImg.classList.add("showing");
-  currImg.closest("div").style.backgroundColor = "white";
-  showingArray.push(currImg);
-
-  if (showingArray.length <= 1) return;
-  if (showingArray.length >= 1) {
-    for (let i = 0; i < showingArray.length; i++) {
-      if (showingArray.length <= 1) return;
-      if (showingArray[i].src !== currImg.src) {
-        showingArray[i].closest("div").style.backgroundColor = "green";
-        showingArray[i].classList.remove("showing");
-        showingArray.shift();
-      } else {
-        showingArray[i].classList.add("match");
-        currImg.classList.add("match");
-        matchSound.play();
-        showingArray.shift();
-
-        showingArray.shift();
+    // Add and display moves
+    this._moves();
+    // Display images
+    this._displayImg();
+    // Add game mechanics
+    this._mechanics();
+    // for win
+    this._forWin();
+  }
+  _clearInst() {
+    startGameBtn.classList.remove("hiddden");
+    inst.classList.add("hiddden");
+  }
+  _moves() {
+    this.#movesCounter++;
+    moves.textContent = `moves: ${this.#movesCounter}`;
+  }
+  _displayImg() {
+    this.#currImg.classList.add("showing");
+    this.#currImg.closest("div").style.backgroundColor = "white";
+    this.#showingArray.push(this.#currImg);
+  }
+  _mechanics() {
+    if (this.#showingArray.length <= 1) return;
+    if (this.#showingArray.length >= 1) {
+      for (this.#i = 0; this.#i < this.#showingArray.length; this.#i++) {
+        if (this.#showingArray.length <= 1) return;
+        if (this.#showingArray[this.#i].src !== this.#currImg.src)
+          this._diffImg();
+        else {
+          this._sameImg();
+        }
       }
     }
   }
-  if (document.querySelectorAll(".match").length === imagesArray.length) {
-    moves.textContent = `You won with ${movesCounter} moves`;
+  _diffImg() {
+    this.#showingArray[this.#i].closest("div").style.backgroundColor = "green";
+    this.#showingArray[this.#i].classList.remove("showing");
+    this.#showingArray.shift();
   }
-  //       console.log("removed showing from dog");
-  //       x++;
-  //       console.log(x);
-  //       console.log(currentlyShowing);
-  //       // if (document.getElementsByClassName("showing").length <= 1) return;
-  //     } else {
-  //       currentlyShowing[i].classList.add("match");
+  _sameImg() {
+    this.#showingArray[this.#i].classList.add("match");
+    this.#currImg.classList.add("match");
+    this.#matchSound.play();
+    this.#showingArray.shift();
+    this.#showingArray.shift();
+  }
+  _forWin() {
+    if (
+      document.querySelectorAll(".match").length === this.#imagesArray.length
+    ) {
+      moves.textContent = `You won with ${this.#movesCounter} moves`;
+    }
+  }
+  _resetGame() {
+    console.log("clicked");
+    images.textContent = "";
+    startGameBtn.classList.add("hiddden");
+    inst.classList.remove("hiddden");
+    moves.textContent = "";
+    this.#movesCounter = 0;
+    this.#showingArray = [];
+    this._start();
+  }
+}
 
-  //       currImg.classList.add("match");
-  //     }
-  //   }
-  // }
-});
-
-// }
-//   // moves++;
-//   let curr = event.currentTarget.children
-//   let currImg = curr[0]
-//  var currentlyshowing = document.getElementsByClassName('showimg');
-//   currentlyshowing = document.getElementsByClassName('showimg');
-//   let flag=0;
-//   if(currentlyshowing.length >= 1){
-//       for(let i=0;i<currentlyshowing.length;i++)
-//       {
-//           if(currentlyshowing[i].src != currImg.src)
-//           currentlyshowing[i].classList.remove('showimg');
-//           else{
-//               currentlyshowing[i].classList.add('match');
-//               currImg.classList.add('match')
-//               flag=1;
-//           }
-//       }
-//   }
-
-// e.target.firstElementChild.classList.remove("hidden");
-//     e.target.firstElementChild.classList.add("showing");
-//     const currentShowing = document.querySelectorAll(".showing");
-//     console.log(currentShowing);
-//     currentShowing.forEach((cs) => {
-//       for (let i = currentShowing.length - 1; i >= 1; i--) {
-//         if (cs.src !== currImg.src) {
-//           cs.classList.remove("showing");
-//           cs.classList.add("hidden");
-//         } else {
-//           currImg.classList.remove("showing");
-//           currImg.classList.add("match");
-//           cs.classList.remove("showing");
-//           cs.classList.add("match");
-//         }
-//       }
-
-// const hi = document.getElementsByClassName("hi");
-// let hey = document.getElementsByClassName("hey");
-// it will return an html collection with <p class="hey"> one</p> as the only element
-// then if i add hey class to hi
-// hi.classList.add("hey")
-//add i getElementsByClassName("hey")
-// hey = document.getElementsByClassName("hey");
-//then it will return an html collection with
-//  <p class="hi hey"> two </p>  as the first item
-// and <p class="hey"> one</p> as the second item
-
-// my question is that is it possible for <p class="hey"> one</p> to be the first item since it
-// was the first element to have the class name hey
-// and <p class="hi hey"> two </p> to be the second item
+const app = new App();
