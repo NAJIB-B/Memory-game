@@ -1,6 +1,7 @@
 const images = document.querySelector(".images");
 const moves = document.querySelector(".moves");
 const startGameBtn = document.querySelector(".startGameBtn");
+const resetGameBtn = document.querySelector(".resetGameBtn");
 const script = document.querySelector(".script");
 const inst = document.querySelector(".inst");
 
@@ -16,6 +17,10 @@ class App {
   #suffelldArray;
 
   #currImg;
+
+  #imagesCopy;
+
+  #state = false;
 
   #i;
 
@@ -42,18 +47,24 @@ class App {
 
     images.addEventListener("click", this._playGame.bind(this));
 
-    startGameBtn.addEventListener("click", this._resetGame.bind(this));
+    resetGameBtn.addEventListener("click", this._resetGame.bind(this));
+
+    startGameBtn.addEventListener("click", this._startGame.bind(this));
   }
   _start() {
-    const imagesCopy = [...this.#imagesArray];
-    this._suffleImages(imagesCopy);
-    imagesCopy.forEach((i) => {
-      console.log(i);
+    this.#imagesCopy = [...this.#imagesArray];
+    this._suffleImages(this.#imagesCopy);
+    this.#imagesCopy.forEach((i) => {
       const html = `
-      <div class="imgDiv"><img src="${i}" alt="" class="hidden"></div>
+      <div class="transition imgDiv">
+      <img src="${i}" alt="" class="hidden dImg"></div>
       `;
       images.insertAdjacentHTML("beforeend", html);
     });
+  }
+  _showImg() {
+    console.log("here");
+    console.log(dImg);
   }
   _suffleImages(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -65,6 +76,8 @@ class App {
     this.#suffelldArray = array;
   }
   _playGame(e) {
+    // check game state
+    if (!this.#state) return;
     // play sound
     this.#sound.play();
     // clear instructions
@@ -82,16 +95,20 @@ class App {
     this._forWin();
   }
   _clearInst() {
-    startGameBtn.classList.remove("hiddden");
+    resetGameBtn.classList.remove("hiddden");
     inst.classList.add("hiddden");
+  }
+  _displayInst() {
+    startGameBtn.classList.add("hiddden");
+    inst.classList.remove("hiddden");
   }
   _moves() {
     this.#movesCounter++;
     moves.textContent = `moves: ${this.#movesCounter}`;
   }
   _displayImg() {
+    this.#currImg.closest("div").classList.add("imgDivTrans");
     this.#currImg.classList.add("showing");
-    this.#currImg.closest("div").style.backgroundColor = "white";
     this.#showingArray.push(this.#currImg);
   }
   _mechanics() {
@@ -108,7 +125,7 @@ class App {
     }
   }
   _diffImg() {
-    this.#showingArray[this.#i].closest("div").style.backgroundColor = "green";
+    this.#showingArray[this.#i].closest("div").classList.remove("imgDivTrans");
     this.#showingArray[this.#i].classList.remove("showing");
     this.#showingArray.shift();
   }
@@ -127,14 +144,40 @@ class App {
     }
   }
   _resetGame() {
-    console.log("clicked");
     images.textContent = "";
-    startGameBtn.classList.add("hiddden");
-    inst.classList.remove("hiddden");
+    this.#state = false;
+    resetGameBtn.classList.add("hiddden");
+    startGameBtn.classList.remove("hiddden");
     moves.textContent = "";
     this.#movesCounter = 0;
     this.#showingArray = [];
     this._start();
+  }
+  _startGame() {
+    this.#state = true;
+    this._default();
+    this.#imagesCopy.forEach((i) => {
+      const html = `
+      <div class="imgDivWhite"><img src="${i}" alt="" class="dImg"></div>
+      `;
+      images.insertAdjacentHTML("beforeend", html);
+    });
+    setTimeout(() => {
+      this._default();
+      this.#imagesCopy.forEach((i) => {
+        const html = `
+          <div class="imgDiv transition"><img src="${i}" alt="" class="hidden dImg"></div>
+          `;
+        images.insertAdjacentHTML("beforeend", html);
+      });
+    }, 3000);
+    this._displayInst();
+  }
+  _default() {
+    images.textContent = "";
+    moves.textContent = "";
+    this.#movesCounter = 0;
+    this.#showingArray = [];
   }
 }
 
